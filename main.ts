@@ -4,48 +4,67 @@ type Color = {
     l: number;
 }
 
-const stripLength: number = 29
-const blackColor: Color = { h: 0, s: 0, l: 0 };
-const colorArray: Array<Color> = [  //deklarace konstanty colorArray
-    { h: 0, s: 100, l: 50}, //inicializace pole Array
-    { h: 120, s: 100, l: 50 },
-    { h: 240, s: 100, l: 50 },
-    { h: 60, s: 100, l: 50 }
-    ];
+let stripLength = 29;
+let strip = neopixel.create(DigitalPin.P0, stripLength, NeoPixelMode.RGB)
 
-    const colorArray2: Array<Color> = [
-    { h: 0, s: 100, l: 50 },
-    { h: 120, s: 100, l: 50 },
-    { h: 240, s: 100, l: 50 },
-    { h: 60, s: 100, l: 50 },
-    { h: 180, s: 100, l: 50 }
+const colors: Array<Color> = [
+{ h: 0, s: 100, l: 50 },
+{ h: 30, s: 100, l: 50 },
+{ h: 60, s: 100, l: 50 },
+{ h: 120, s: 100, l: 50 },
+{ h: 240, s: 100, l: 50 },
 ];
 
-colorArray.push({ h: 10, s: 100, l: 50 }),
+let middle = Math.floor(stripLength/2);
+let maxStep = Math.floor(stripLength/2);
+let colorIndex = 0;
 
-
-console.log(strip);
-strip.length = 7;
-console.log(strip.length)
-strip.fill(blackColor)
-console.log("strip: array<Color> = ", strip);
-
-for (let i = 0; i < strip.length; i += 1) {
-    colorsData[0][i] = colorArray[i % colorArray.length];
+function hslToRgb(h: number, s: number, l: number): NeoPixelMode.RGB {
+    return neopixel.hsl(h, s, l)
 }
 
-for (let i = 0; i < strip.length; i += 1) {
-    colorsData[1][i] = colorArray2[i % colorArray2.length];
-}
-
-let x: number = 0;
-
-let pasek: neopixel.Strip = neopixel.create(DigitalPin.P8, 29, NeopixelMode RGB);
-pasek,setPixelColor(0, neopixel.rgb(255, 192, 192));
-
-basic.forever(function () {
-	pasek.rotate();
-    pasek.show()
+basic.forever(function() {
+    let color: Color = colors[colorIndex % colors.length]
+    let rgbColor = hslToRgb(color.h, color.s, color.l);
+    strip.setPixelColor(middle, rgbColor);
+    strip.show();
     basic.pause(100);
-    
+
+    for(let step = 1; step <= maxStep; step++) {
+        strip.clear();
+
+        color = colors[(colorIndex + step) % colors.length]
+        rgbColor = hslToRgb(color.h, color.s, color.l);
+
+        strip.setPixelColor(middle + step, rgbColor);
+        strip.setPixelColor(middle - step, rgbColor);
+
+        for(let i = 0; i <= step; i++) {
+            strip.setPixelColor(middle + i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
+            strip.setPixelColor(middle - i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
+        }
+
+        strip.show();
+        basic.pause(100);
+    }
+
+    for(let step = maxStep; step >= 1; step--) {
+        strip.clear();
+
+        color = colors[(colorIndex + step) % colors.length]
+        rgbColor = hslToRgb(color.h, color.s, color.l);
+
+        strip.setPixelColor(middle + step, rgbColor);
+        strip.setPixelColor(middle - step, rgbColor);
+
+        for(let i = 0; i <= step; i++) {
+            strip.setPixelColor(middle + i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
+            strip.setPixelColor(middle - i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
+        }
+        strip.show();
+        basic.pause(100);
+
+}
+
+colorIndex++
 })
