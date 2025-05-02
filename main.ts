@@ -1,67 +1,67 @@
 type Color = {
-    r: number
-    g: number
-    b: number
+   r: number,
+   g: number,
+   b: number
 }
-let stripLength = 15;
-let time = 100
+
+let stripLength = 17;
+let time = 200
 let strip = neopixel.create(DigitalPin.P2, stripLength, NeoPixelMode.RGB)
 
 const colors: Array<Color> = [
-    (r:255, g:0, b:0)
-    (r: 0, g: 255, b: 0)
-    (r: 0, g: 0, b: 255)
-    (r: 255, g: 0, b: 0)
-    (r: 255, g: 0, b: 0)
+    { r: 255, g: 0, b: 0 },
+    { r: 255, g: 127, b: 0 },
+    { r: 255, g: 255, b: 0 },
+    { r: 0, g: 255, b: 0 },
+    { r: 0, g: 0, b: 255 },
+    { r: 75, g: 0, b: 130 },
+    { r: 148, g: 0, b: 211 } 
 ];
 
 let middle = Math.floor(stripLength / 2);
-let maxStep = Math.floor(stripLength / 2);
+let maxStep = middle;
 let colorIndex = 0;
 
-function hslToRgb(h: number, s: number, l: number): NeoPixelMode.RGB {
-    return neopixel.hsl(h, s, l)
+basic.forever(function(){
+    for (let step = 0; step <= maxStep; step++) {
+        strip.clear()
+
+        let color = colors[colorIndex]
+        let c = neopixel.rgb(color.r, color.g, color.b)
+
+        let left = middle - step
+        let right = middle + step
+        for(let i = left; i <= right; i++){
+            if(i >= 0 && i < stripLength){
+                strip.setPixelColor(i, c)
+            }
+        }
+
+        strip.show()
+        basic.pause(time)
+        console.log(colorIndex)
+
+        colorIndex = (colorIndex + 1) % colors.length
+    }
+    
+for(let step = maxStep; step >= 0; step--){
+    strip.clear()
+    let color = colors[colorIndex]
+    let c = neopixel.rgb(color.r, color.g, color.b)
+
+    let left = middle - step;
+    let right = middle +step;
+    for(let i = left; i <= right; i++) {
+        if(i >= 0 && i < stripLength) {
+            strip.setPixelColor(i, c)
+        }
+    }
+    
+strip.show()
+basic.pause(time)
+console.log(colorIndex)
+
+colorIndex = (colorIndex + 1) % colors.length
 }
-
-basic.forever(function () {
-    let color: Color = colors[colorIndex % colors.length]
-    let rgbColor = hslToRgb(color.h, color.s, color.l);
-    strip.setPixelColor(middle, rgbColor);
-    strip.show();
-    basic.pause(time);
-
-    for (let step = 1; step <= maxStep; step++) {
-        strip.clear();
-
-        color = colors[(colorIndex + step) % colors.length]
-
-        strip.setPixelColor(middle, rgbColor);
-        strip.setPixelColor(middle + step, rgbColor);
-        strip.setPixelColor(middle - step, rgbColor);
-
-        for (let i = 0; i <= step; i++) {
-            strip.setPixelColor(middle + i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
-            strip.setPixelColor(middle - i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
-        }
-
-        strip.show();
-        basic.pause(time);
-    }
-
-    for (let step = maxStep; step >= 1; step--) {
-        strip.clear();
-
-        color = colors[(colorIndex + step) % colors.length]
-        rgbColor = hslToRgb(color.h, color.s, color.l);
-
-        strip.setPixelColor(middle + step, rgbColor);
-        strip.setPixelColor(middle - step, rgbColor);
-
-        for (let i = 0; i <= step; i++) {
-            strip.setPixelColor(middle + i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
-            strip.setPixelColor(middle - i, hslToRgb(colors[(colorIndex + i) % colors.length].h, colors[(colorIndex + i) % colors.length].s, colors[(colorIndex + i) % colors.length].l))
-        }
-        strip.show();
-        basic.pause(time);
-    }
+    
 })
